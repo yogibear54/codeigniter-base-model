@@ -68,6 +68,12 @@ class MY_Model extends CI_Model
     protected $belongs_to = array();
     protected $has_many = array();
 
+    /**
+     * CHRISLI: note this with array also holds ordercol, orderby and select multi array
+     * if this is provides to the relationship and is used to set order by in the
+     * related data pulled.
+     * @var type 
+     */
     protected $_with = array();
 
     /**
@@ -424,10 +430,12 @@ class MY_Model extends CI_Model
      * RELATIONSHIPS
      * ------------------------------------------------------------ */
 
-    public function with($relationship)
+    public function with($relationship, $ordercol = null, $orderby = null)
     {
         $this->_with[] = $relationship;
-
+        $this->_with[$relationship]['orderby'] = $orderby;
+        $this->_with[$relationship]['ordercol'] = $ordercol;
+        
         if (!in_array('relate', $this->after_get))
         {
             $this->after_get[] = 'relate';
@@ -462,10 +470,16 @@ class MY_Model extends CI_Model
 
                 if (is_object($row))
                 {
+                    if (!empty($this->_with[$relationship]['ordercol'])) {
+                        $this->{$relationship . '_model'}->order_by($this->_with[$relationship]['ordercol'], $this->_with[$relationship]['orderby']);
+                    }
                     $row->{$relationship} = $this->{$relationship . '_model'}->get($row->{$options['primary_key']});
                 }
                 else
                 {
+                    if (!empty($this->_with[$relationship]['ordercol'])) {
+                        $this->{$relationship . '_model'}->order_by($this->_with[$relationship]['ordercol'], $this->_with[$relationship]['orderby']);
+                    }
                     $row[$relationship] = $this->{$relationship . '_model'}->get($row[$options['primary_key']]);
                 }
             }
@@ -490,10 +504,16 @@ class MY_Model extends CI_Model
 
                 if (is_object($row))
                 {
+                    if (!empty($this->_with[$relationship]['ordercol'])) {
+                        $this->{$relationship . '_model'}->order_by($this->_with[$relationship]['ordercol'], $this->_with[$relationship]['orderby']);
+                    }
                     $row->{$relationship} = $this->{$relationship . '_model'}->get_many_by($options['primary_key'], $row->{$this->primary_key});
                 }
                 else
                 {
+                    if (!empty($this->_with[$relationship]['ordercol'])) {
+                        $this->{$relationship . '_model'}->order_by($this->_with[$relationship]['ordercol'], $this->_with[$relationship]['orderby']);
+                    }
                     $row[$relationship] = $this->{$relationship . '_model'}->get_many_by($options['primary_key'], $row[$this->primary_key]);
                 }
             }
