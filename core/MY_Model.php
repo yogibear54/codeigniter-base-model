@@ -446,9 +446,12 @@ class MY_Model extends CI_Model
 
     public function relate($row)
     {
-		if (empty($row))
+        //hotfix: remove for table reference in primary key for use in code later for get_many_by
+        $this->primary_key = str_replace($this->_table . '.', '', $this->primary_key);
+        
+	if (empty($row))
         {
-		    return $row;
+            return $row;
         }
 
         foreach ($this->belongs_to as $key => $value)
